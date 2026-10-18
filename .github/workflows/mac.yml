@@ -1,0 +1,20 @@
+name: Free macOS Web Session
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+    - name: Set up VNC Screen Share
+      run: |
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all
+        sudo dscl . -passwd /Users/runner password123
+    - name: Install and Run Web Console
+      run: |
+        brew install node
+        npm install -g localtunnel
+        npx localtunnel --port 5900 > link.txt &
+        sleep 5
+        cat link.txt
+        sleep 21600
