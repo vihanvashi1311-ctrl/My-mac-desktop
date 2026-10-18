@@ -6,15 +6,27 @@ jobs:
   build:
     runs-on: macos-14
     steps:
-    - name: Set up VNC Screen Share
+    - name: Turn on Mac Screen Sharing
       run: |
         sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all
-        sudo dscl . -passwd /Users/runner password123
-    - name: Install and Run Web Console
+
+    - name: Deploy Browser Web Console
       run: |
         brew install node
         npm install -g localtunnel
-        npx localtunnel --port 5900 > link.txt &
+        
+        # Download the web layout wrapper
+        git clone https://github.com
+        
+        # Start the video-to-web web service on port 6080
+        ./noVNC/utils/novnc_proxy --vnc localhost:5900 --listen 6080 &
         sleep 5
-        cat link.txt
+        
+        # Create the public link for iPad Safari
+        npx localtunnel --port 6080 > web_link.txt &
+        sleep 5
+        
+        echo "=== OPEN THIS LINK IN IPAD SAFARI ==="
+        cat web_link.txt
+        echo "====================================="
         sleep 21600
